@@ -1,31 +1,17 @@
-//! Initialization
 var express = require('express');
 var app = express();
 var bodyParser = require("body-parser");
-var port = process.env.PORT || 9000;
-var router = express.Router();
+var port = 10000;
 var cors = require('cors');
 var Twitter = require('twitter-lite');
 
-const corsOptions ={
-  origin:'*', 
-  credentials:true,            //access-control-allow-credentials:true
-  optionSuccessStatus:200,
-}
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use("/oauth", router);
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: 'https://user.oleplatform.com'
+}));
 
-
-//! Middleware
-router.use(function (req, res, next) {
-  next();
-})
-
-//! HTTP Methods
-router.post("/request_token",function (request, response) {
+app.post("/oauth/request_token",function (request, response) {
   if (!request.body.callback){
     response.send({ message: "Callback is required."})
   }
@@ -46,7 +32,7 @@ router.post("/request_token",function (request, response) {
   })
 })
 
-router.post("/access_token",function (request, response) {
+app.post("/oauth/access_token",function (request, response) {
   if (!request.body.oauth_verifier){
     response.send({ message: "OAuth Verifier is required."})
   }
