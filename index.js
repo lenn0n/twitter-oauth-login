@@ -8,6 +8,7 @@ var Twitter = require('twitter-lite');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors({
+  credentials: true,
   origin: 'https://user.oleplatform.com'
 }));
 
