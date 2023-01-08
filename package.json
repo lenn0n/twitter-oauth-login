@@ -1,0 +1,22 @@
+{
+  "name": "oauth",
+  "version": "4.0.0",
+  "description": "Server to server call for Twitter API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Oauth2",
+    "LoginWithTwitter",
+    "CORS"
+  ],
+  "author": "Lennon Benedict Jansuy",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.1",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "twitter-lite": "^1.1.0"
+  }
+}

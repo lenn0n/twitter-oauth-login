@@ -1,0 +1,100 @@
+//! Initialization
+var express = require('express');
+var app = express();
+var bodyParser = require("body-parser");
+var port = process.env.PORT || 9000;
+var router = express.Router();
+var cors = require('cors');
+var Twitter = require('twitter-lite');
+
+const corsOptions ={
+  origin:'*', 
+  credentials:true,            //access-control-allow-credentials:true
+  optionSuccessStatus:200,
+}
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use("/oauth", router);
+app.use(cors(corsOptions));
+
+
+//! Middleware
+router.use(function (req, res, next) {
+  next();
+})
+
+//! HTTP Methods
+router.post("/request_token",function (request, response) {
+  if (!request.body.callback){
+    response.send({ message: "Callback is required."})
+  }
+  if (!request.body.config){
+    response.send({ message: "Config is required."})
+  }
+
+  const client = new Twitter(request.body.config);
+  client.getRequestToken(request.body.callback)
+  .then(res => {
+    response.send({
+      ...res,
+      redirectURL: "https://api.twitter.com/oauth/authenticate?oauth_token=" + res.oauth_token
+    })
+  })
+  .catch(err => {
+    response.send({ result: false, message: "We are unable to authenticate you."})
+  })
+})
+
+router.post("/access_token",function (request, response) {
+  if (!request.body.oauth_verifier){
+    response.send({ message: "OAuth Verifier is required."})
+  }
+  if (!request.body.oauth_token){
+    response.send({ message: "OAuth token is required."})
+  }
+  if (!request.body.config){
+    response.send({ message: "Config is required."})
+  }
+
+  const client = new Twitter(request.body.config);
+  client.getAccessToken({
+    oauth_verifier: request.body.oauth_verifier,
+    oauth_token: request.body.oauth_token
+  })
+  .then(res => {
+    const user = new Twitter({
+      subdomain: "api", 
+      version: "1.1",
+      consumer_key: request.body.config.consumer_key,
+      consumer_secret:  request.body.config.consumer_secret, 
+      access_token_key: res.oauth_token, 
+      access_token_secret: res.oauth_token_secret
+    });
+    
+    user.get("account/verify_credentials", {
+      include_email: true,
+      skip_status: true,
+      include_entities: false
+    })
+    .then(results => {
+      response.send({ 
+        email: results.email, 
+        access_token: res.oauth_token,
+        access_secret: res.oauth_token_secret,
+        user_id: res.user_id,
+        screen_name: res.screen_name
+      })
+    })
+    .catch(err => {
+      response.send({ result: false, message: "We are unable to authenticate you."})
+    })
+  })
+  .catch(err => {
+    response.send({ result: false, message: "We are unable to authenticate you."})
+  })
+})
+
+app.listen(port, function () {
+  console.log("Running on port: ", port)
+})
