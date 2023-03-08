@@ -7,10 +7,13 @@ var Twitter = require('twitter-lite');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cors({
-  credentials: true,
-  origin: ['https://user.oleplatform.com', 'https://sandbox.user.oleplatform.com']
-}));
+
+var corsOptions = {
+  origin: ['https://user.oleplatform.com', 'https://sandbox.user.oleplatform.com'],
+  optionsSuccessStatus: 200 // For legacy browser support
+  }
+  
+app.use(cors(corsOptions));
 
 app.post("/oauth/request_token",function (request, response) {
   if (!request.body.callback){
