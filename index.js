@@ -10,10 +10,15 @@ app.use(bodyParser.json());
 
 var corsOptions = {
   origin: ['https://user.oleplatform.com', 'https://sandbox.user.oleplatform.com'],
-  optionsSuccessStatus: 200 // For legacy browser support
+  default: "https://user.oleplatform.com"
   }
   
-app.use(cors(corsOptions));
+app.all('*', function(req, res, next) {
+  const origin = corsOptions.origin.includes(req.header('origin').toLowerCase()) ? req.headers.origin : cors.default;
+  res.header("Access-Control-Allow-Origin", origin);
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 app.post("/oauth/request_token",function (request, response) {
   if (!request.body.callback){
