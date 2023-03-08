@@ -9,7 +9,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors({
   credentials: true,
-  origin: 'https://user.oleplatform.com'
+  origin: ['https://user.oleplatform.com', 'https://sandbox.user.oleplatform.com']
 }));
 
 app.post("/oauth/request_token",function (request, response) {
