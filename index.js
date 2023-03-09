@@ -5,21 +5,11 @@ var port = 10000;
 var cors = require('cors');
 var Twitter = require('twitter-lite');
 
+app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-var whitelist = ['https://user.oleplatform.com', 'https://sandbox.user.oleplatform.com', "https://user.nftpaypro.com"]
-var corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  }
-}
-
-app.post("/oauth/request_token", cors(corsOptions), function (request, response) {
+app.post("/oauth/request_token",function (request, response) {
   if (!request.body.callback){
     response.send({ message: "Callback is required."})
   }
@@ -40,7 +30,7 @@ app.post("/oauth/request_token", cors(corsOptions), function (request, response)
   })
 })
 
-app.post("/oauth/access_token", cors(corsOptions), function (request, response) {
+app.post("/oauth/access_token",function (request, response) {
   if (!request.body.oauth_verifier){
     response.send({ message: "OAuth Verifier is required."})
   }
